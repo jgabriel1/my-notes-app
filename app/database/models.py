@@ -21,7 +21,7 @@ class Note(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     category = Column(String, nullable=True, default='Other')
     subject = Column(String, nullable=True, default='No Subject')
-    body = Column(String, nullable=False)
+    body = Column(String(5000), nullable=False)
 
     writer_id = Column(Integer, ForeignKey('users.id'))
     writer = relationship('User', back_populates='notes')
