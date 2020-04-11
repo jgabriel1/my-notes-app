@@ -2,6 +2,8 @@ from sqlalchemy import Boolean, Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base, engine
 
+# Base models:
+
 
 class User(Base):
 
@@ -25,3 +27,9 @@ class Note(Base):
 
     writer_id = Column(Integer, ForeignKey('users.id'))
     writer = relationship('User', back_populates='notes')
+
+
+# Table objects:
+
+users_table = User.__table__
+notes_table = Note.__table__

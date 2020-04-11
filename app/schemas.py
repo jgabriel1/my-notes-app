@@ -5,4 +5,7 @@ class NoteSchema(BaseModel):
     category: str = 'Other'
     subject: str = 'No Subject'
     body: str
-    writer_id: int
+
+
+class UserSchema(BaseModel):
+    id: int

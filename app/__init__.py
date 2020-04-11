@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import db
-from app.routes import notes
+from app.api import notes, users
 
 app = FastAPI()
 
@@ -16,3 +16,4 @@ async def shutdown():
 
 
 app.include_router(notes.router)
+app.include_router(users.router)
