@@ -1,16 +1,17 @@
+from typing import List
 from fastapi import APIRouter, Request, Body
 from fastapi.responses import JSONResponse
-from app.schemas import NoteSchema, UserSchema
+from app.schemas import NoteSchema
 from app.database import db
 from app.database.models import notes_table
-from typing import List
 
 router = APIRouter()
 
 
 @router.get('/notes', response_model=List[NoteSchema])
-async def view(user: UserSchema):
-    query = notes_table.select().where(notes_table.c.writer_id == user.id)
+async def view(user_id: int = Body(..., embed=True)):
+    query = notes_table.select().where(notes_table.c.writer_id == user_id)
+
     return await db.fetch_all(query)
 
 

@@ -8,4 +8,5 @@ class NoteSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
-    id: int
+    name: str
+    pwd_hash: str
