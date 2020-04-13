@@ -1,5 +1,4 @@
-from typing import List
-from fastapi import APIRouter, Request, Body
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from app.schemas import NoteSchema
 from app.database import db
@@ -8,15 +7,10 @@ from app.database.models import notes_table
 router = APIRouter()
 
 
-@router.get('/notes', response_model=List[NoteSchema])
-async def view(user_id: int = Body(..., embed=True)):
-    query = notes_table.select().where(notes_table.c.writer_id == user_id)
-
-    return await db.fetch_all(query)
-
-
 @router.post('/notes', status_code=201)
 async def create(note: NoteSchema, request: Request):
+
+    # Turn this into a decorator that checks authorization header:
     try:
         writer_id = request.headers['Authorization']
     except KeyError:
@@ -36,10 +30,27 @@ async def create(note: NoteSchema, request: Request):
 
 @router.delete('/notes/{note_id}', status_code=204)
 async def delete(note_id: int, request: Request):
-    # Problem: this deletes even if the id doesn't match
     query = notes_table.delete().where(
-        notes_table.c.id == note_id and
-        notes_table.c.writer_id == request.headers['Authorization']
+        (notes_table.c.id == note_id) &
+        (notes_table.c.writer_id == request.headers['Authorization'])
+    )
+
+    return await db.execute(query)
+
+
+@router.put('/notes/{note_id}', status_code=204)
+async def edit(
+    note_id: int,
+    updated_note: NoteSchema,
+    request: Request
+):
+    # Check security. As is, it can update writer_id:
+    query = notes_table.update(
+    ).values(
+        **updated_note.dict()
+    ).where(
+        (notes_table.c.id == note_id) &
+        (notes_table.c.writer_id == request.headers['Authorization'])
     )
 
     return await db.execute(query)
