@@ -9,7 +9,6 @@ router = APIRouter()
 
 @router.post('/notes', status_code=201)
 async def create(note: NoteSchema, Authorization: str = Header(...)):
-
     query = notes_table.insert().values(
         **note.dict(),
         writer_id=Authorization
@@ -36,6 +35,7 @@ async def edit(
     updated_note: NoteSchema,
     Authorization: str = Header(...)
 ):
+    # Check how to update only values that were sent;
     # Check security! As is, it can update writer_id:
     query = notes_table.update(
     ).values(
