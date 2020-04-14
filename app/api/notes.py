@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Header
 from fastapi.responses import JSONResponse
 from app.schemas import NoteSchema
 from app.database import db
@@ -8,19 +8,11 @@ router = APIRouter()
 
 
 @router.post('/notes', status_code=201)
-async def create(note: NoteSchema, request: Request):
-
-    # Turn this into a decorator that checks authorization header:
-    try:
-        writer_id = request.headers['Authorization']
-    except KeyError:
-        return JSONResponse({
-            "Error": "Missing Writer ID on headers."
-        }, status_code=403)
+async def create(note: NoteSchema, Authorization: str = Header(...)):
 
     query = notes_table.insert().values(
         **note.dict(),
-        writer_id=writer_id
+        writer_id=Authorization
     )
 
     return {
@@ -29,28 +21,28 @@ async def create(note: NoteSchema, request: Request):
 
 
 @router.delete('/notes/{note_id}', status_code=204)
-async def delete(note_id: int, request: Request):
+async def delete(note_id: int, Authorization: str = Header(...)):
     query = notes_table.delete().where(
         (notes_table.c.id == note_id) &
-        (notes_table.c.writer_id == request.headers['Authorization'])
+        (notes_table.c.writer_id == Authorization)
     )
 
-    return await db.execute(query)
+    await db.execute(query)
 
 
 @router.put('/notes/{note_id}', status_code=204)
 async def edit(
     note_id: int,
     updated_note: NoteSchema,
-    request: Request
+    Authorization: str = Header(...)
 ):
-    # Check security. As is, it can update writer_id:
+    # Check security! As is, it can update writer_id:
     query = notes_table.update(
     ).values(
         **updated_note.dict()
     ).where(
         (notes_table.c.id == note_id) &
-        (notes_table.c.writer_id == request.headers['Authorization'])
+        (notes_table.c.writer_id == Authorization)
     )
 
-    return await db.execute(query)
+    await db.execute(query)

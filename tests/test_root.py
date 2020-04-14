@@ -1,4 +1,4 @@
-from . import client
+from tests import client
 
 
 def test_user_login():
