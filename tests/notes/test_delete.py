@@ -20,7 +20,7 @@ class TestDeleteNote:
 
         return created.json()['id']
 
-    def test_regular(self):
+    def test_expected(self):
         id = self.create_note_to_delete()
 
         response = client.delete(
@@ -44,7 +44,7 @@ class TestDeleteNote:
         
         assert 400 <= response.status_code < 500
 
-    def test_different_id(self):
+    def test_wrong_id(self):
         """
         It shouldn't allow the user to delete a note they didn't create.
         It should also tell the user that he didn't create that note he's

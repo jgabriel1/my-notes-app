@@ -7,6 +7,10 @@ class NoteSchema(BaseModel):
     body: str
 
 
+class ReturnNote(NoteSchema):
+    id: int = None
+
+
 class UserSchema(BaseModel):
     name: str
     pwd_hash: str

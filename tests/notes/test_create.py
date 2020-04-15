@@ -1,5 +1,6 @@
 from tests import client
 from pydantic import BaseModel
+from requests.models import Response
 
 
 class TestCreateNote:
@@ -13,9 +14,9 @@ class TestCreateNote:
         "body": "Test Body. This is a sort of long text."
     }
 
-    def response(self, without: str):
+    def response(self, missing: str) -> Response:
         note = self.test_note.copy()
-        note.pop(without)
+        note.pop(missing)
 
         return client.post(
             url="/notes",
@@ -27,19 +28,19 @@ class TestCreateNote:
         )
 
     def test_no_category(self):
-        response = self.response(without="category")
+        response = self.response(missing="category")
 
         assert response.status_code == 201
         assert self.Response(**response.json())
 
     def test_no_subject(self):
-        response = self.response(without="subject")
+        response = self.response(missing="subject")
 
         assert response.status_code == 201
         assert self.Response(**response.json())
 
     def test_no_body(self):
-        response = self.response(without="body")
+        response = self.response(missing="body")
 
         assert 400 <= response.status_code < 500
 

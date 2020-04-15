@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Body
 from app.database import db
 from app.database.models import users_table, notes_table
-from app.schemas import UserSchema, NoteSchema
+from app.schemas import UserSchema, NoteSchema, ReturnNote
 from typing import List
 
 router = APIRouter()
 
 # Figure out a way to grab notes using relationship table:
-@router.get('/', response_model=List[NoteSchema])
+@router.get('/', response_model=List[ReturnNote])
 async def login(user_id: int = Body(..., embed=True)):
     query = notes_table.select().where(notes_table.c.writer_id == user_id)
 

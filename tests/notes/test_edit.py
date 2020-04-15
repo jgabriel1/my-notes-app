@@ -27,7 +27,7 @@ class TestEditNote:
 
         return created.json()['id']
 
-    def test_regular(self):
+    def test_expected(self):
         """
         TODO: 
         Check if the note was really updated, since the response
@@ -55,7 +55,7 @@ class TestEditNote:
 
         assert 400 <= response.status_code < 500
 
-    def test_different_id(self):
+    def test_wrong_id(self):
         """
         TODO:
         It shouldn't allow the user to edit a note they didn't create.
