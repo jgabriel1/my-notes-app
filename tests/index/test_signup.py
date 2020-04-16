@@ -10,7 +10,8 @@ class TestCreateUser:
     class ResponseSchema(BaseModel):
         id: int
 
-    def create_user(self) -> Response:
+    @staticmethod
+    def create_user() -> Response:
         user = {
             "name": "TestUser",
             "pwd_hash": "0f0f0f0f0f"
