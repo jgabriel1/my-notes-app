@@ -40,7 +40,7 @@ class TestUserLogin:
         response = client.get("/", json=wrong_pwd)
 
         assert response.status_code == 401
-        assert response.json() == {"Error": "Wrong Password!"}
+        assert response.json() == {"detail": "Wrong Password!"}
 
     def test_not_signedup(self):
         not_signed_user = {"name": "Timmy", "pwd_hash": "1234"}
@@ -49,5 +49,5 @@ class TestUserLogin:
 
         assert response.status_code == 403
         assert response.json() == {
-            "Error": "You're not signed up! Create an account first."
+            "detail": "You\'re not signed up! Create an account first."
         }
