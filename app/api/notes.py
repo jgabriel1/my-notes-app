@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Request, Header
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, Header, HTTPException
+from sqlalchemy.sql import select
 from app.schemas import NoteSchema
 from app.database import db
 from app.database.models import notes_table
@@ -17,14 +17,23 @@ async def create(note: NoteSchema, Authorization: str = Header(...)):
     return {
         "id": await db.execute(query)
     }
+# updated tests and authorization checks
 
 
 @router.delete('/notes/{note_id}', status_code=204)
 async def delete(note_id: int, Authorization: str = Header(...)):
-    query = notes_table.delete().where(
-        (notes_table.c.id == note_id) &
-        (notes_table.c.writer_id == Authorization)
+    note = await db.fetch_one(
+        select(
+            [notes_table.c.id, notes_table.c.writer_id]
+        ).where(
+            notes_table.c.id == note_id
+        )
     )
+
+    if note.writer_id != int(Authorization):
+        raise HTTPException(403, detail="Couldn't delete. Wrong Authorization")
+
+    query = notes_table.delete().where(notes_table.c.id == note_id)
 
     await db.execute(query)
 
@@ -35,14 +44,26 @@ async def edit(
     updated_note: NoteSchema,
     Authorization: str = Header(...)
 ):
-    # Check how to update only values that were sent;
-    # Check security! As is, it can update writer_id:
+    """
+    The authorization check may be inefficient since it's making 2 queries.
+    It might be making the route significantly slower.
+    """
+    note = await db.fetch_one(
+        select(
+            [notes_table.c.id, notes_table.c.writer_id]
+        ).where(
+            notes_table.c.id == note_id
+        )
+    )
+
+    if note.writer_id != int(Authorization):
+        raise HTTPException(403, detail="Couldn't edit. Wrong Authorization.")
+
     query = notes_table.update(
     ).values(
         **updated_note.dict()
     ).where(
-        (notes_table.c.id == note_id) &
-        (notes_table.c.writer_id == Authorization)
+        notes_table.c.id == note_id
     )
 
     await db.execute(query)

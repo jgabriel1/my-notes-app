@@ -1,4 +1,6 @@
 from tests import client
+from app.database import Session
+from app.database.models import notes_table
 
 
 class TestEditNote:
@@ -28,11 +30,6 @@ class TestEditNote:
         return created.json()['id']
 
     def test_expected(self):
-        """
-        TODO: 
-        Check if the note was really updated, since the response
-        won't return anything.
-        """
         id = self.create_note_to_edit()
 
         response = client.put(
@@ -43,6 +40,29 @@ class TestEditNote:
 
         assert response.status_code == 204
         assert not response.json()
+
+    def test_if_edits(self):
+        id = self.create_note_to_edit()
+
+        response = client.put(
+            url=f"/notes/{id}",
+            headers=self.headers,
+            json=self.edited_note
+        )
+
+        db = Session()
+        query = notes_table.select().where(notes_table.c.id == id)
+        note = db.execute(query).fetchone()
+
+        note_dict = {
+            "category": note.category,
+            "subject": note.subject,
+            "body": note.body
+        }
+
+        assert response.status_code == 204
+        assert note
+        assert note_dict == self.edited_note
 
     def test_no_header(self):
         id = self.create_note_to_edit()
@@ -68,7 +88,7 @@ class TestEditNote:
             url=f"/notes/{id}",
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "4321" # Wrong ID for authorization.
+                "Authorization": "4321"  # Wrong ID for authorization.
             },
             json=self.edited_note
         )
