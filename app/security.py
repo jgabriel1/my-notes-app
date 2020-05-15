@@ -28,7 +28,7 @@ def hash_password(password: str) -> str:
 async def get_user_db(db: Database, username: str) -> User:
     user = await db.fetch_one(
         users_table.select().where(
-            users_table.c.name == username
+            users_table.c.username == username
         )
     )
     return user
@@ -39,7 +39,7 @@ async def authenticate_user(
     user = await get_user_db(db, username)
     if not user:
         return False
-    if not verify_password(password, user.pwd_hash):
+    if not verify_password(password, user.password):
         return False
     return user
 

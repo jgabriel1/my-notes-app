@@ -12,5 +12,10 @@ class ReturnNote(NoteSchema):
 
 
 class UserSchema(BaseModel):
-    name: str
-    pwd_hash: str
+    username: str
+    password: str
+
+
+class UserRegister(BaseModel):
+    username: str
+    password: str

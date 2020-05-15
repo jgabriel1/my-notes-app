@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 
 SECRET_KEY = 'supersecret'
-ALGORITHM = 'HS256'
 
 
 class Token(BaseModel):
@@ -19,12 +18,12 @@ def create_access_token(
     to_encode = data.copy()
     to_encode.update({'exp': expire})
 
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, SECRET_KEY)
 
 
 def decode_token(token: str) -> dict:
     try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return jwt.decode(token, SECRET_KEY)
     except jwt.PyJWTError:
         raise HTTPException(
             status_code=401,
