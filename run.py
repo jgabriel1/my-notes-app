@@ -9,5 +9,5 @@ if __name__ == "__main__":
         "app:app",
         port=8000,
         reload=True,
-        use_colors=False
+        use_colors=True
     )
