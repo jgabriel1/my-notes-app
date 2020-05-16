@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Header, HTTPException, Depends
-from sqlalchemy.sql import select
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
+from app.crud import crud_notes
 from app.schemas import NoteSchema, ReturnNote, UserSchema
 from app.database import db
-from app.database.models import notes_table
 from app.security import get_current_user
 
 router = APIRouter()
@@ -11,40 +10,29 @@ router = APIRouter()
 
 @router.get('/notes', response_model=List[ReturnNote])
 async def list_all(user: UserSchema = Depends(get_current_user)):
-    query = notes_table.select().where(
-        notes_table.c.writer_id == user.id
-    )
-    return await db.fetch_all(query)
+    notes_list = await crud_notes.read_all(db, user.id)
+    return notes_list
 
 
 @router.post('/notes', status_code=201)
 async def create(note: NoteSchema, user: UserSchema = Depends(get_current_user)):
-    query = notes_table.insert().values(
-        **note.dict(),
-        writer_id=user.id
-    )
-    return {
-        "id": await db.execute(query)
-    }
+    note_id = await crud_notes.create(db, note, user.id)
+    return {'id': note_id}
 
 
 @router.delete('/notes/{note_id}', status_code=204)
 async def delete(note_id: int, user: UserSchema = Depends(get_current_user)):
-    note = await db.fetch_one(
-        select(
-            [notes_table.c.id, notes_table.c.writer_id]
-        ).where(
-            notes_table.c.id == note_id
-        )
-    )
+    try:
+        writer_id = await crud_notes.get_writer_id(db, note_id)
+    except AttributeError:
+        raise HTTPException(
+            404, detail='Note doesn\'t exist or has already been deleted')
 
-    if note.writer_id != user.id:
+    if writer_id != user.id:
         raise HTTPException(
             403, detail="Couldn't delete. Wrong Authorization.")
 
-    query = notes_table.delete().where(notes_table.c.id == note_id)
-
-    await db.execute(query)
+    await crud_notes.delete(db, note_id)
 
 
 @router.put('/notes/{note_id}', status_code=204)
@@ -53,22 +41,13 @@ async def edit(
     updated_note: NoteSchema,
     user: UserSchema = Depends(get_current_user)
 ):
-    note = await db.fetch_one(
-        select(
-            [notes_table.c.id, notes_table.c.writer_id]
-        ).where(
-            notes_table.c.id == note_id
-        )
-    )
+    try:
+        writer_id = await crud_notes.get_writer_id(db, note_id)
+    except AttributeError:
+        raise HTTPException(
+            404, detail='Note doesn\'t exist or has already been deleted')
 
-    if note.writer_id != user.id:
-        raise HTTPException(403, detail="Couldn't edit. Wrong Authorization.")
+    if writer_id != user.id:
+        raise HTTPException(403, detail='Couldn\'t edit. Wrong Authorization.')
 
-    query = notes_table.update(
-    ).values(
-        **updated_note.dict()
-    ).where(
-        notes_table.c.id == note_id
-    )
-
-    await db.execute(query)
+    await crud_notes.update(db, note_id, updated_note)
