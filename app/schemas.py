@@ -12,10 +12,6 @@ class ReturnNote(NoteSchema):
 
 
 class UserSchema(BaseModel):
-    username: str
-    password: str
-
-
-class UserRegister(BaseModel):
+    id: int = None
     username: str
     password: str

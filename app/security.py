@@ -1,16 +1,9 @@
-from typing import Union
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from databases import Database
 from passlib.context import CryptContext
-from app.database import db
-from app.database.models import users_table, User
+from app.database import Database, db, users_table, User
 from app.token import decode_token
-
-# All functions here grab user information from db while authenticating
-# their credentials and raising errors if they occur. All of this will
-# be abstracted by the last function which should just return the User
-# object that can be used in the routes.
+from app.schemas import UserSchema
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -25,17 +18,17 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-async def get_user_db(db: Database, username: str) -> User:
+async def get_user_db(db: Database, username: str) -> UserSchema:
     user = await db.fetch_one(
         users_table.select().where(
             users_table.c.username == username
         )
     )
-    return user
+    return UserSchema(**user)
 
 
 async def authenticate_user(
-        db: Database, username: str, password: str) -> Union[bool, User]:
+        db: Database, username: str, password: str) -> UserSchema:
     user = await get_user_db(db, username)
     if not user:
         return False
@@ -44,7 +37,7 @@ async def authenticate_user(
     return user
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserSchema:
     credentials_exception = HTTPException(
         status_code=401,
         detail='Invalid authentication credentials.',
@@ -61,6 +54,3 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         raise credentials_exception
 
     return user
-
-
-# https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/
