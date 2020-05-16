@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 
@@ -9,6 +10,10 @@ class NoteSchema(BaseModel):
 
 class ReturnNote(NoteSchema):
     id: int = None
+
+
+class NotesListSchema(BaseModel):
+    notes: List[ReturnNote]
 
 
 class UserSchema(BaseModel):
