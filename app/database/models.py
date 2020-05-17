@@ -6,7 +6,6 @@ from .setup import Base
 
 
 class User(Base):
-
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -17,7 +16,6 @@ class User(Base):
 
 
 class Note(Base):
-
     __tablename__ = 'notes'
 
     id = Column(Integer, primary_key=True, autoincrement=True)

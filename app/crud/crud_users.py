@@ -1,7 +1,7 @@
 from databases import Database
-from app.schemas import UserSchema
-from app.database import users_table
-from app.security.hash import hash_password, verify_password
+from ..schemas import UserSchema
+from ..database import users_table
+from ..security.hash import hash_password, verify_password
 
 
 async def register_new(database: Database, user: UserSchema) -> None:

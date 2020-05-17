@@ -1,27 +1,38 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.crud import crud_notes
-from app.schemas import NoteSchema, UserSchema, NotesListSchema
-from app.database import db
-from app.security import get_current_user
+from ..crud import crud_notes
+from ..schemas import NoteSchema, UserSchema, NotesListSchema
+from ..database import get_db, Database
+from ..security import get_current_user
 
 router = APIRouter()
 
 
 @router.get('/notes', response_model=NotesListSchema)
-async def list_all(user: UserSchema = Depends(get_current_user)):
-    notes_list = await crud_notes.read_all(db, user.id)
+async def list_all(
+    user: UserSchema = Depends(get_current_user),
+    database: Database = Depends(get_db)
+):
+    notes_list = await crud_notes.read_all(database, user.id)
     return {'notes': notes_list}
 
 
 @router.post('/notes', status_code=201)
-async def create(note: NoteSchema, user: UserSchema = Depends(get_current_user)):
-    note_id = await crud_notes.create(db, note, user.id)
+async def create(
+    note: NoteSchema,
+    user: UserSchema = Depends(get_current_user),
+    database: Database = Depends(get_db)
+):
+    note_id = await crud_notes.create(database, note, user.id)
     return {'id': note_id}
 
 
 @router.delete('/notes/{note_id}', status_code=204)
-async def delete(note_id: int, user: UserSchema = Depends(get_current_user)):
-    writer_id = await crud_notes.get_writer_id(db, note_id)
+async def delete(
+    note_id: int,
+    user: UserSchema = Depends(get_current_user),
+    database: Database = Depends(get_db)
+):
+    writer_id = await crud_notes.get_writer_id(database, note_id)
 
     if not writer_id:
         raise HTTPException(
@@ -31,16 +42,17 @@ async def delete(note_id: int, user: UserSchema = Depends(get_current_user)):
         raise HTTPException(
             403, detail='Couldn\'t delete. Wrong Authorization.')
 
-    await crud_notes.delete(db, note_id)
+    await crud_notes.delete(database, note_id)
 
 
 @router.put('/notes/{note_id}', status_code=204)
 async def edit(
     note_id: int,
     updated_note: NoteSchema,
-    user: UserSchema = Depends(get_current_user)
+    user: UserSchema = Depends(get_current_user),
+    database: Database = Depends(get_db)
 ):
-    writer_id = await crud_notes.get_writer_id(db, note_id)
+    writer_id = await crud_notes.get_writer_id(database, note_id)
 
     if not writer_id:
         raise HTTPException(
@@ -49,4 +61,4 @@ async def edit(
     if writer_id != user.id:
         raise HTTPException(403, detail='Couldn\'t edit. Wrong Authorization.')
 
-    await crud_notes.update(db, note_id, updated_note)
+    await crud_notes.update(database, note_id, updated_note)

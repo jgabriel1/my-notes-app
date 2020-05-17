@@ -14,4 +14,7 @@ Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-db = Database(SQLALCHEMY_DATABASE_URL)
+
+async def get_db(url: str = SQLALCHEMY_DATABASE_URL) -> Database:
+    database = Database(url=url)
+    return database

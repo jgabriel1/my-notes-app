@@ -1,18 +1,20 @@
-from fastapi import FastAPI
-from app.database import db
-from app.api import notes, login
+from fastapi import FastAPI, Depends
+from .database import get_db, Database
+from .api import notes, login
 
 app = FastAPI()
 
 
 @app.on_event('startup')
 async def startup():
-    await db.connect()
+    database: Database = await get_db()
+    await database.connect()
 
 
 @app.on_event('shutdown')
 async def shutdown():
-    await db.disconnect()
+    database: Database = await get_db()
+    await database.disconnect()
 
 
 app.include_router(notes.router)

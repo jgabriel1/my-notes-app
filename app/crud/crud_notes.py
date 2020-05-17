@@ -1,8 +1,8 @@
 from typing import List
 from databases import Database
 from sqlalchemy.sql import select
-from app.database import notes_table, Note
-from app.schemas import ReturnNote, NoteSchema
+from ..database import notes_table, Note
+from ..schemas import ReturnNote, NoteSchema
 
 
 async def create(database: Database, note: NoteSchema, user_id: int) -> int:
