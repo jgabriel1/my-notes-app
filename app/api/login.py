@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, security
-from ..database import get_db, Database
+from ..deps import get_db, Database
 from ..schemas import UserSchema
 from ..crud import crud_users
 from ..security.token import Token, create_access_token

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from ..crud import crud_notes
 from ..schemas import NoteSchema, UserSchema, NotesListSchema
-from ..database import get_db, Database
-from ..security import get_current_user
+from ..deps import get_db, Database, get_current_user
 
 router = APIRouter()
 

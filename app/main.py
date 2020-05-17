@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from .database import get_db, Database
+from .deps import get_db, Database
 from .api import notes, login
 
 app = FastAPI()

@@ -1,10 +1,15 @@
 from fastapi import Depends, HTTPException, security
-from ..database import get_db, Database
-from ..security.token import decode_token
-from ..schemas import UserSchema
-from ..crud import crud_users
+from .database import Database, SQLALCHEMY_DATABASE_URL
+from .security.token import decode_token
+from .schemas import UserSchema
+from .crud import crud_users
 
 oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='/token')
+
+
+async def get_db() -> Database:
+    database = Database(url=SQLALCHEMY_DATABASE_URL)
+    return database
 
 
 async def get_current_user(
