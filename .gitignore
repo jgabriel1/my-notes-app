@@ -1,5 +1,5 @@
 .vscode
-db.sqlite
+*.sqlite3
 TODO.md
 
 # Byte-compiled / optimized / DLL files

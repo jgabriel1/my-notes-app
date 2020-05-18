@@ -18,4 +18,4 @@ async def shutdown():
 
 
 app.include_router(notes.router)
-app.include_router(login.router)
+app.include_router(login.router, prefix='/login')

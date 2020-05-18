@@ -1,10 +1,11 @@
 from fastapi import Depends, HTTPException, security
-from .database import Database, SQLALCHEMY_DATABASE_URL
-from .security.token import decode_token
-from .schemas import UserSchema
-from .crud import crud_users
 
-oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='/token')
+from .crud import crud_users
+from .database import SQLALCHEMY_DATABASE_URL, Database
+from .schemas import UserSchema
+from .security.token import decode_token
+
+oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='/login/token')
 
 
 async def get_db() -> Database:
@@ -16,10 +17,6 @@ async def get_current_user(
     token: str = Depends(oauth2_scheme),
     database: Database = Depends(get_db)
 ) -> UserSchema:
-    """
-    To put this into crud_users as well or not?
-    Only concern is the http exception. No other crud operations have exceptions.
-    """
     credentials_exception = HTTPException(
         status_code=401,
         detail='Invalid authentication credentials.',
