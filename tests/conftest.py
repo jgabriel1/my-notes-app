@@ -15,14 +15,9 @@ async def get_test_db():
     return database
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def override_db():
     app.dependency_overrides[get_db] = get_test_db
-
-
-@pytest.fixture(scope='session')
-def client(override_db) -> TestClient:
-    return TestClient(app)
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -34,3 +29,16 @@ def reset_db():
 
     Base.metadata.drop_all(test_engine)
     Base.metadata.create_all(test_engine)
+
+
+@pytest.fixture(scope='session')
+def client() -> TestClient:
+    return TestClient(app)
+
+
+@pytest.fixture
+def sample_user() -> dict:
+    return {
+        'username': 'test_username',
+        'password': 'mypassword123'
+    }

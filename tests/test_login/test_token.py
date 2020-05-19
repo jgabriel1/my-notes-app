@@ -1,38 +1,6 @@
 import time
 
-import pytest
-from pydantic import BaseModel
-
-
-@pytest.fixture
-def sample_user() -> dict:
-    return {
-        'username': 'test_username',
-        'password': 'mypassword123'
-    }
-
-
-@pytest.fixture
-def validate_token_response():
-
-    class ResponseModel(BaseModel):
-        access_token: str
-        token_type: str
-
-    return ResponseModel.validate
-
-
-def test_register_user(client, sample_user, validate_token_response):
-    response = client.post(
-        url='/login/register',
-        headers={'Content-Type': 'application/json'},
-        json=sample_user
-    )
-    json_response = response.json()
-
-    assert response.status_code == 201
-    assert validate_token_response(json_response)
-    assert json_response.get('token_type') == 'bearer'
+from .fixtures import validate_token_response
 
 
 def test_get_new_token(client, sample_user, validate_token_response):
@@ -50,9 +18,11 @@ def test_get_new_token(client, sample_user, validate_token_response):
     # Request a new token with form data:
     token_response = client.post(url='/login/token', data=sample_user)
 
+    token_type_is_bearer: bool = token_response.json().get('token_type') == 'bearer'
+
     assert token_response.status_code == 200
     assert validate_token_response(token_response.json())
-    assert token_response.json().get('token_type') == 'bearer'
+    assert token_type_is_bearer
 
     first_token = register_response.json().get('access_token')
     second_token = token_response.json().get('access_token')
