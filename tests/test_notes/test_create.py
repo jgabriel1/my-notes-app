@@ -1,34 +1,42 @@
-from .fixtures import sample_note, token_header
+from typing import Callable
+
+import pytest
+from pydantic import create_model
+
+from .fixtures import token_header
 
 
-def test_create(client, sample_note, token_header):
+@pytest.fixture
+def validate_response() -> Callable:
+    model = create_model('ResponseModel', id=(int, ...))
+    return model.validate
+
+
+def test_create(client, sample_note, token_header, validate_response):
     response = client.post('/notes', headers=token_header, json=sample_note)
 
     assert (response.status_code == 201)  # Created
-    assert ('id' in response.json().keys())  # response carries id
-    assert isinstance(response.json().get('id'), int)  # id is an integer
+    assert validate_response(response.json())
 
 
-def test_create_no_note_category(client, sample_note, token_header):
+def test_create_no_note_category(client, sample_note, token_header, validate_response):
     note = sample_note.copy()
     note.pop('category')
 
     response = client.post('/notes', headers=token_header, json=note)
 
     assert (response.status_code == 201)  # should still create
-    assert ('id' in response.json().keys())
-    assert isinstance(response.json().get('id'), int)
+    assert validate_response(response.json())
 
 
-def test_create_no_note_subject(client, sample_note, token_header):
+def test_create_no_note_subject(client, sample_note, token_header, validate_response):
     note = sample_note.copy()
     note.pop('subject')
 
     response = client.post('/notes', headers=token_header, json=note)
 
     assert (response.status_code == 201)  # should still create
-    assert ('id' in response.json().keys())
-    assert isinstance(response.json().get('id'), int)
+    assert validate_response(response.json())
 
 
 def test_create_no_note_body(client, sample_note, token_header):

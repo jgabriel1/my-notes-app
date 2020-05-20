@@ -35,7 +35,7 @@ async def delete(
     writer_id = await crud_notes.get_writer_id(database, note_id)
 
     if not writer_id:
-        raise HTTPException(404, detail='lalalal')
+        raise HTTPException(404)
 
     if writer_id != user.id:
         raise HTTPException(

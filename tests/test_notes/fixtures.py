@@ -29,8 +29,3 @@ def created_note_id(client, sample_note, token_header) -> int:
 
     note_id: int = creation_response.json().get('id')
     return note_id
-
-
-@pytest.fixture
-def bulk_create_notes():
-    pass

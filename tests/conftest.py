@@ -22,13 +22,14 @@ def override_db():
 
 @pytest.fixture(scope='function', autouse=True)
 def reset_db():
-    test_engine = create_engine(
-        TEST_DATABASE_URL,
-        connect_args={'check_same_thread': False}
-    )
-
-    Base.metadata.drop_all(test_engine)
-    Base.metadata.create_all(test_engine)
+    try:
+        test_engine = create_engine(
+            TEST_DATABASE_URL,
+            connect_args={'check_same_thread': False}
+        )
+        yield Base.metadata.create_all(test_engine)
+    finally:
+        Base.metadata.drop_all(test_engine)
 
 
 @pytest.fixture(scope='session')

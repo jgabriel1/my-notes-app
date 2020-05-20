@@ -40,11 +40,22 @@ def test_delete_never_created_note(client, token_header):
 
 
 def test_delete_with_wrong_authorization(client, token_header, created_note_id):
+    # Create new user:
+    new_user_creation = client.post(url='/login/register', headers={
+        'Content-Type': 'application/json'
+    }, json={
+        'username': 'different_username', 'password': 'newpass123'
+    })
+    assert new_user_creation.ok
+
+    new_user_token: str = new_user_creation.json().get('access_token')
+    new_user_header = {'Authorization': f'Bearer {new_user_token}'}
+
     # Attempt to delete note with wrong credentials:
     deletion_attempt = client.delete(
-        url=f'/notes/{created_note_id}', headers={'Authorization': 'Bearer 12345'}
+        url=f'/notes/{created_note_id}', headers=new_user_header
     )
     error_message: str = deletion_attempt.json().get('detail')
 
-    assert (deletion_attempt.status_code == 401)  # Unauthorized
-    assert (error_message == 'Invalid authentication credentials.')
+    assert (deletion_attempt.status_code == 403)  # Unauthorized
+    assert (error_message == 'Couldn\'t delete. Wrong Authorization.')
