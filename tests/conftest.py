@@ -42,3 +42,12 @@ def sample_user() -> dict:
         'username': 'test_username',
         'password': 'mypassword123'
     }
+
+
+@pytest.fixture
+def sample_note() -> dict:
+    return {
+        'category': 'test category',
+        'subject': 'test subject',
+        'body': 'This is the body.'
+    }

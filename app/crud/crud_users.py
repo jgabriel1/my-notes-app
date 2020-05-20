@@ -1,6 +1,7 @@
 from databases import Database
-from ..schemas import UserSchema
+
 from ..database import users_table
+from ..schemas import UserSchema
 from ..security.hash import hash_password, verify_password
 
 

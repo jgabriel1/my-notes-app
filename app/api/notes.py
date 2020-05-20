@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
+
 from ..crud import crud_notes
-from ..schemas import NoteSchema, UserSchema, NotesListSchema
-from ..deps import get_db, Database, get_current_user
+from ..deps import Database, get_current_user, get_db
+from ..schemas import NoteSchema, NotesListSchema, UserSchema
 
 router = APIRouter()
 
@@ -34,8 +35,7 @@ async def delete(
     writer_id = await crud_notes.get_writer_id(database, note_id)
 
     if not writer_id:
-        raise HTTPException(
-            404, detail='Note doesn\'t exist or has already been deleted.')
+        raise HTTPException(404, detail='lalalal')
 
     if writer_id != user.id:
         raise HTTPException(
@@ -54,8 +54,7 @@ async def edit(
     writer_id = await crud_notes.get_writer_id(database, note_id)
 
     if not writer_id:
-        raise HTTPException(
-            404, detail='Note doesn\'t exist or has already been deleted.')
+        raise HTTPException(404)
 
     if writer_id != user.id:
         raise HTTPException(403, detail='Couldn\'t edit. Wrong Authorization.')
