@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, security
-from ..deps import get_db, Database
-from ..schemas import UserSchema
+
 from ..crud import crud_users
+from ..deps import Database, get_db
+from ..schemas import UserSchema
 from ..security.token import Token, create_access_token
 
 router = APIRouter()

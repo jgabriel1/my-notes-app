@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Depends
-from .deps import get_db, Database
-from .api import notes, login
+from fastapi import Depends, FastAPI
+
+from .api import login, notes
+from .deps import Database, get_db
 
 app = FastAPI()
 

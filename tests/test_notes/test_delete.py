@@ -1,4 +1,4 @@
-from .fixtures import token_header, created_note_id
+from .fixtures import created_note_id, token_header
 
 
 def test_delete_note(client, token_header, created_note_id):
