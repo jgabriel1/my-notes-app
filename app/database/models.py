@@ -10,7 +10,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(20), nullable=False)
+    username = Column(String(20), nullable=False, unique=True)
     password = Column(String, nullable=False)
 
     notes = relationship('Note', back_populates='writer')

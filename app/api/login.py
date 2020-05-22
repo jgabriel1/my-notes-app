@@ -1,3 +1,5 @@
+from sqlite3 import IntegrityError
+
 from fastapi import APIRouter, Depends, HTTPException, security
 
 from ..crud import crud_users
@@ -10,7 +12,12 @@ router = APIRouter()
 
 @router.post('/register', status_code=201, response_model=Token)
 async def register(user: UserSchema, database: Database = Depends(get_db)):
-    await crud_users.register_new(database, user)
+    try:
+        await crud_users.register_new(database, user)
+    except IntegrityError:
+        raise HTTPException(
+            200, detail=f'The username {user.username} is already taken.')
+
     access_token = create_access_token(data={'sub': user.username})
     return {'access_token': access_token, 'token_type': 'bearer'}
 

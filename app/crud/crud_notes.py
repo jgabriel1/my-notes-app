@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from databases import Database
 from sqlalchemy.sql import select
@@ -31,15 +31,15 @@ async def update(
     ).where(
         notes_table.c.id == note_id
     )
-    return await database.execute(query)
+    await database.execute(query)
 
 
 async def delete(database: Database, note_id: int) -> None:
     query = notes_table.delete().where(notes_table.c.id == note_id)
-    return await database.execute(query)
+    await database.execute(query)
 
 
-async def get_writer_id(database: Database, note_id: int) -> int:
+async def get_writer_id(database: Database, note_id: int) -> Optional[int]:
     query = select([
         notes_table.c.writer_id
     ]).where(
@@ -47,4 +47,5 @@ async def get_writer_id(database: Database, note_id: int) -> int:
     )
     note = await database.fetch_one(query)
 
-    return note.writer_id if note is not None else None
+    if note is not None:
+        return note.writer_id

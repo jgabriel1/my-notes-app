@@ -1,3 +1,5 @@
+from typing import Optional
+
 from databases import Database
 
 from ..database import users_table
@@ -10,19 +12,21 @@ async def register_new(database: Database, user: UserSchema) -> None:
         username=user.username,
         password=hash_password(user.password)
     )
-    return await database.execute(query)
+    await database.execute(query)
 
 
-async def get_info(database: Database, username: str) -> UserSchema:
+async def get_info(database: Database, username: str) -> Optional[UserSchema]:
     query = users_table.select().where(
         users_table.c.username == username
     )
     user = await database.fetch_one(query)
-    return UserSchema(**user)
+
+    if user is not None:
+        return UserSchema(**user)
 
 
 async def authenticate(
-        database: Database, username: str, password: str) -> UserSchema:
+        database: Database, username: str, password: str) -> Optional[UserSchema]:
     user = await get_info(database, username)
     if not user:
         return False
