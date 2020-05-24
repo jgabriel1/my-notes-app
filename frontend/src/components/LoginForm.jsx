@@ -13,7 +13,10 @@ const LoginForm = (props) => {
 
         try {
             const response = await api.post('login/token', data, { headers: headers })
-            console.log(response)
+
+            const token = await response.data.access_token
+            // This is not secure, should change to httpOnly cookie here and in backend
+            sessionStorage.setItem('token', token)
         } catch (error) {
             console.log(error)
         }
