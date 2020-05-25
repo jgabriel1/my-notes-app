@@ -1,6 +1,8 @@
 import React from 'react'
 
-const EditableField = ({ isEditable, labelText, state, stateSetter }) => {
+import InputField from './InputField'
+
+const EditableField = ({ state, stateSetter, labelText, isEditable, textArea }) => {
     /*
     This component should change from a simple text display
     to an editable field by clicking on the edit button.
@@ -15,21 +17,23 @@ const EditableField = ({ isEditable, labelText, state, stateSetter }) => {
 
     */
 
-    const displayBlock = <p className="noteDisplayValue">{state}</p>
-    const editableBlock = <input
-        type="text"
-        className="noteEditValue"
-        value={state}
-        onChange={event => stateSetter(event.target.value)}
+    const displayBlock = <label>
+        {labelText}
+        <p className="noteDisplayValue">{state}</p>
+    </label>
+    
+    const editableBlock = <InputField
+        state={state}
+        stateSetter={stateSetter}
+        labelText={labelText}
+        textArea={textArea}
     />
 
     const currentElement = isEditable ? editableBlock : displayBlock
 
     return (
         <div className="noteProperty">
-            <label> {labelText}
-                {currentElement}
-            </label>
+            {currentElement}
         </div>
     )
 }

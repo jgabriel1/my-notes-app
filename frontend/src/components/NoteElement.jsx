@@ -2,7 +2,11 @@ import React, { useState } from 'react'
 
 import EditableField from './EditableField'
 
-const NoteElement = ({ category, subject, body }) => {
+import api from '../services/api'
+import { getToken } from '../utils/tokenHandler'
+
+const NoteElement = ({ noteId, category, subject, body }) => {
+    
     const [currentCategory, setCategory] = useState(category)
     const [currentSubject, setSubject] = useState(subject)
     const [currentBody, setBody] = useState(body)
@@ -10,10 +14,25 @@ const NoteElement = ({ category, subject, body }) => {
     const [editMode, setEditMode] = useState(false)
 
     const sendEdited = async () => {
-        /* Handle api connection */
-        console.log(currentCategory)
-        console.log(currentSubject)
-        console.log(currentBody)
+        const token = getToken()
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+
+        const noteData = {
+            category: currentCategory,
+            subject: currentSubject,
+            body: currentBody
+        }
+
+        try {
+            const response = await api.put(`notes/${noteId}`, noteData, { headers: headers })
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const editButtons = editing => {
@@ -40,6 +59,7 @@ const NoteElement = ({ category, subject, body }) => {
                 labelText="Category: "
                 state={currentCategory}
                 stateSetter={setCategory}
+                textArea={false}
             />
 
             <EditableField
@@ -47,6 +67,7 @@ const NoteElement = ({ category, subject, body }) => {
                 labelText="Subject: "
                 state={currentSubject}
                 stateSetter={setSubject}
+                textArea={false}
             />
 
             <EditableField
@@ -54,6 +75,7 @@ const NoteElement = ({ category, subject, body }) => {
                 labelText="Body: "
                 state={currentBody}
                 stateSetter={setBody}
+                textArea={true}
             />
 
             {editButtons(editMode)}

@@ -1,5 +1,7 @@
 import React from 'react'
+
 import api from '../services/api'
+import { setToken } from '../utils/tokenHandler'
 
 import '../styles/LoginForm.css'
 
@@ -15,8 +17,7 @@ const LoginForm = (props) => {
             const response = await api.post('login/token', data, { headers: headers })
 
             const token = await response.data.access_token
-            // This is not secure, should change to httpOnly cookie here and in backend
-            sessionStorage.setItem('token', token)
+            setToken(token)
         } catch (error) {
             console.log(error)
         }

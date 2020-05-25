@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 
-import api from '../services/api'
+import InputField from './InputField'
 
-import FieldInput from './FieldInput'
+import api from '../services/api'
+import { getToken } from '../utils/tokenHandler'
 
 const CreateNoteForm = (props) => {
     const [category, setCategory] = useState('')
@@ -12,7 +13,7 @@ const CreateNoteForm = (props) => {
     const createNote = async (event) => {
         event.preventDefault()
 
-        const token = sessionStorage.getItem('token')
+        const token = getToken()
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -36,25 +37,26 @@ const CreateNoteForm = (props) => {
 
     return (
         <div className="createNoteContainer">
-            <FieldInput
+            <InputField
                 name="category"
                 state={category}
                 stateSetter={setCategory}
                 labelText="Category: "
             />
 
-            <FieldInput
+            <InputField
                 name="subject"
                 state={subject}
                 stateSetter={setSubject}
                 labelText="Subject: "
             />
 
-            <FieldInput
+            <InputField
                 name="body"
                 state={body}
                 stateSetter={setBody}
                 labelText="Body: "
+                textArea={true}
             />
 
             <button onClick={createNote}>Create</button>
