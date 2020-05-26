@@ -1,17 +1,11 @@
 import React from 'react';
 
-import LoginForm from './components/LoginForm'
-import CreateNoteForm from './components/CreateNoteForm'
-import NotesList from './components/NotesList'
+import Routes from './routes'
+
+import './global.css'
 
 const App = () => {
-  return (
-    <div className="App">
-      <LoginForm />
-      <CreateNoteForm />
-      <NotesList />
-    </div>
-  );
+	return <Routes />
 }
 
-export default App;
+export default App
