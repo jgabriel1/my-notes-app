@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
+import { Link } from 'react-router-dom'
+
 import NoteElement from '../../components/NoteElement'
 
 import api from '../../services/api'
@@ -30,6 +32,7 @@ const Notes = props => {
 
     return (
         <div className="notesListContainer">
+            <Link to="/create">Create Note</Link>
             <ul>
                 {notesList.map(note => (
                     <li key={note.id}>
