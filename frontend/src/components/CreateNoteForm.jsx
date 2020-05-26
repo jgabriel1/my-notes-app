@@ -5,7 +5,7 @@ import InputField from './InputField'
 import api from '../services/api'
 import { getToken } from '../utils/tokenHandler'
 
-const CreateNoteForm = (props) => {
+const CreateNoteForm = props => {
     const [category, setCategory] = useState('')
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
@@ -24,6 +24,12 @@ const CreateNoteForm = (props) => {
             subject: subject,
             body: body
         }
+
+        api.post('notes', noteData, { headers: headers })
+            .then(response => {
+
+            })
+            .catch(error => console.log(error))
 
         try {
             const response = await api.post('/notes', noteData, { headers: headers })

@@ -6,14 +6,14 @@ import api from '../services/api'
 import { getToken } from '../utils/tokenHandler'
 
 const NoteElement = ({ noteId, category, subject, body }) => {
-    
+
     const [currentCategory, setCategory] = useState(category)
     const [currentSubject, setSubject] = useState(subject)
     const [currentBody, setBody] = useState(body)
 
     const [editMode, setEditMode] = useState(false)
 
-    const sendEdited = async () => {
+    const sendEdited = () => {
         const token = getToken()
 
         const headers = {
@@ -27,12 +27,11 @@ const NoteElement = ({ noteId, category, subject, body }) => {
             body: currentBody
         }
 
-        try {
-            const response = await api.put(`notes/${noteId}`, noteData, { headers: headers })
-            console.log(response)
-        } catch (error) {
-            console.log(error)
-        }
+        api.put(`notes/${noteId}`, noteData, { headers: headers })
+            .then(response => {
+                setEditMode(false)
+            })
+            .catch(error => console.log(error))
     }
 
     const editButtons = editing => {

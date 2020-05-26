@@ -18,13 +18,11 @@ const Register = () => {
 
         const headers = { 'Content-Type': 'application/json' }
 
-        /*
-        This register route returns 200 if the username is already
-        taken, this might be considering it as a success. This is
-        not intended!
-        */
         api.post('login/register', userData, { headers: headers })
             .then(response => {
+                if (response.status === 200) {
+                    throw Error('Username already taken.')
+                } 
                 history.push('/')
             })
             .catch(error => {
